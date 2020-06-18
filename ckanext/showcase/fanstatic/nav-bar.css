@@ -4,12 +4,19 @@
 
 .portal-nav-menu-admin__item {
   position: relative;
+  margin-bottom: 12px;
+  border: 1px solid #0068a9;
+  background-color: white;
+  display: block;
+  padding-left: 30px;
+  padding-right: 25px;
+
 }
 
 span.grippy {
   position: absolute;
-  top: 5px;
-  left: -25px;
+  top: 15px;
+  left: 6px;
   content: '....';
   width: 10px;
   height: 20px;
@@ -26,12 +33,11 @@ span.grippy {
   font-size: 12px;
   font-family: sans-serif;
   letter-spacing: 2px;
-  color: #cccccc;
-  text-shadow: 1px 0 1px black;
+  color: #0068a9;;
 }
 
 span.grippy::after {
-  content: '.. .. .. ..';
+content: '.. .. .. ..';
 }
 
 span.grippy.cursor-grabbing {
@@ -41,6 +47,7 @@ span.grippy.cursor-grabbing {
 }
 
 h3.grippy {
+  color: black;
   cursor: grab;
   cursor: -moz-grab;
   cursor: -webkit-grab;
@@ -50,4 +57,7 @@ h3.grippy.cursor-grabbing {
   cursor: grabbing;
   cursor: -moz-grabbing;
   cursor: -webkit-grabbing;
+}
+.portal-nav-menu-admin__item_link {
+  color: #0068a9;
 }

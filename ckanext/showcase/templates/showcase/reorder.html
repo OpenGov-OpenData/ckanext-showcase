@@ -20,6 +20,9 @@
 {% endblock %}
 
 {% block subtitle %}{{ _('Reorder Showcases') }}{% endblock %}
+{% block secondary_content %}
+  {{ h.snippet('showcase/snippets/helper.html') }}
+{% endblock %}
 
 {% block primary %}
 <div class="primary span12">

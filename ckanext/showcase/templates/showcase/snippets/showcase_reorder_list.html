@@ -1,15 +1,29 @@
-<form method="POST">
-  <ul class="portal-nav-menu-admin">
-    {% for showcase in showcases %}
-      <li class="portal-nav-menu-admin__item">
-        <input type="hidden" name="menu_item_name_{{ showcase.id }}" value="{{ showcase.position }}" />
-        <h3 class="grippy">{{ showcase.title|truncate(80) }}</h3>
-        <span class="grippy"></span>
-      </li>
-    {% endfor %}
-  </ul>
 
-  <div class="form-actions">
-    <button class="btn btn-primary" name="save" type="submit">Save</button>
-  </div>
-</form>
+{% block secondary_content %}
+  {{ h.snippet('showcase/snippets/reorder_helper.html') }}
+{% endblock %}
+
+{% block primary %}
+    {% block primary_content %}
+        <form method="POST">
+            <ul class="portal-nav-menu-admin">
+                {% for showcase in showcases %}
+                    <li class="portal-nav-menu-admin__item">
+                        <input type="hidden" name="menu_item_name_{{ showcase.id }}" value="{{ showcase.position }}"/>
+                        <h3 class="grippy">{{ showcase.title|truncate(80) }}
+                            <a class="portal-nav-menu-admin__item_link"
+                               href={{ showcase.url }}>{{ showcase.url|truncate(80) }}</a>
+                        </h3>
+
+                        <span class="grippy"></span>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            <div class="form-actions">
+                <button class="btn btn-primary" name="save" type="submit">Save</button>
+            </div>
+        </form>
+    {% endblock %}
+{% endblock %}
+
