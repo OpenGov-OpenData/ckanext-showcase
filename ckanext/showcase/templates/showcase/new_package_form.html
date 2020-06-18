@@ -42,6 +42,8 @@
   {% block metadata_fields %}
     {% block package_metadata_fields_url %}
       {{ form.input('url', label=_('External link'), id='field-url', placeholder=_('http://www.example.com'), value=data.url, error=errors.url, classes=['control-medium']) }}
+      {% set redirect_link_checked = data.redirect_link or false %}
+      {{ form.checkbox('redirect_link', label=_('Redirect to external link'), id='field-redirect-link', checked=redirect_link_checked, value=true, error=errors.redirect_link) }}
     {% endblock %}
 
     {% block package_metadata_author %}

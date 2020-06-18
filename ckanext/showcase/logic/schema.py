@@ -47,6 +47,9 @@ def showcase_base_schema():
                       toolkit.get_converter('convert_to_extras')],
         'original_related_item_id': [
             toolkit.get_validator('ignore_missing'),
+            toolkit.get_converter('convert_to_extras')],
+        'redirect_link': [
+            toolkit.get_validator('ignore_missing'),
             toolkit.get_converter('convert_to_extras')]
     }
     return schema
@@ -108,6 +111,9 @@ def showcase_show_schema():
         'image_url': [toolkit.get_converter('convert_from_extras'),
                       toolkit.get_validator('ignore_missing')],
         'original_related_item_id': [
+            toolkit.get_converter('convert_from_extras'),
+            toolkit.get_validator('ignore_missing')],
+        'redirect_link': [
             toolkit.get_converter('convert_from_extras'),
             toolkit.get_validator('ignore_missing')]
     })

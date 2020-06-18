@@ -18,17 +18,24 @@ show_remove    - If True, show the remove button to remove showcase/dataset asso
 <div class="media-item">
   {% block item_inner %}
     {% block image %}
-      {% if showcase.extras[0].value and 'http' not in showcase.extras[0].value %}
-      <img data-lazy="/uploads/showcase/{{ showcase.extras[0].value }}" alt="" class="media-image">
+      {% set image_url = h.get_value_from_showcase_extras(showcase.extras, 'image_url') %}
+      {% if image_url and not image_url.startswith('http') %}
+      <img data-lazy="/uploads/showcase/{{ image_url }}" alt="" class="media-image">
       {% else %}
-      <img data-lazy="{{ showcase.extras[0].value or h.url_for_static('/base/images/placeholder-group.png') }}" alt="" class="media-image">
+      <img data-lazy="{{ image_url or h.url_for_static('/base/images/placeholder-group.png') }}" alt="" class="media-image">
       {% endif %}
     {% endblock %}
     {% block title %}
       <h3>{{ showcase.title }}</h3>
     {% endblock %}
     {% block link %}
-      <a href="{{ h.url_for(controller='ckanext.showcase.controller:ShowcaseController', action='read', id=showcase.name) }}" title="{{ _('View {name}').format(name=showcase.title) }}" class="media-view">
+      {% set redirect_link = h.get_value_from_showcase_extras(showcase.extras, 'redirect_link') %}
+      {% if redirect_link and showcase.url %}
+        {% set showcase_url = showcase.url %}
+      {% else %}
+        {% set showcase_url = h.url_for(controller='ckanext.showcase.controller:ShowcaseController', action='read', id=showcase.name) %}
+      {% endif %}
+      <a class="media-view" href="{{ showcase_url }}" title="{{ _('View {name}').format(name=showcase.title) }}" {% if redirect_link %}target="_blank"{% endif %}>
         <span>{{ _('View {name}').format(name=showcase.title) }}</span>
       </a>
     {% endblock %}

@@ -47,3 +47,10 @@ def get_package_showcase_list(package_id):
     except:
         return []
     return showcases
+
+def get_value_from_showcase_extras(extras, key):
+    value = ''
+    for item in extras:
+        if item.get('key') == key:
+            value = item.get('value')
+    return value

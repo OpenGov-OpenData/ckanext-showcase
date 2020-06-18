@@ -11,6 +11,9 @@ If the DOM structure is changed, the following code should be changed accordingl
 $(this).find("h3").arrt({
     'id': 'slick-slide' + _.instanceUid + i + ''
 })
+$(this).find("a").first().attr({
+    'aria-labelledby': 'slick-slide' + _.instanceUid + i + ''
+})
 
 */
 /*
@@ -2579,6 +2582,9 @@ $(this).find("h3").arrt({
             });
             $(this).find("h3").first().attr({
                 'id': 'slick-slide' + _.instanceUid + i + ''
+            })
+            $(this).find("a").first().attr({
+                'aria-labelledby': 'slick-slide' + _.instanceUid + i + ''
             })
         });
 
