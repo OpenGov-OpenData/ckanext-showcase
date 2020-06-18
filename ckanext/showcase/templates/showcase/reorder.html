@@ -1,5 +1,4 @@
-{% extends "showcase/edit_base.html" %}
-
+{% extends "page.html" %}
 
 {% block breadcrumb_content %}
     <li>{% link_for _('Showcases'), controller='ckanext.showcase.controller:ShowcaseController', action='search' %}</li>
@@ -20,21 +19,18 @@
 {% endblock %}
 
 {% block subtitle %}{{ _('Reorder Showcases') }}{% endblock %}
+
 {% block secondary_content %}
-  {{ h.snippet('showcase/snippets/helper.html') }}
+  {{ h.snippet('showcase/snippets/reorder_helper.html') }}
 {% endblock %}
 
-{% block primary %}
-<div class="primary span8">
-  {% block primary_content %}
-    <section class="module">
-      <div class="module-content">
-        <h1 class="{% block page_heading_class %}page-heading{% endblock %}">{% block page_heading %}{{ _('Reorder Showcases') }}{% endblock %}</h1>
-        {% block primary_content_inner %}
+{% block primary_content %}
+  <section class="module">
+    <div class="module-content">
+      <h1 class="{% block page_heading_class %}page-heading{% endblock %}">{% block page_heading %}{{ _('Reorder Showcases') }}{% endblock %}</h1>
+      {% block primary_content_inner %}
         {% snippet 'showcase/snippets/showcase_reorder_list.html', showcases=c.showcases %}
-        {% endblock %}
-      </div>
-    </section>
-  {% endblock %}
-</div>
+      {% endblock %}
+    </div>
+  </section>
 {% endblock %}

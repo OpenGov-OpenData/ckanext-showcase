@@ -21,8 +21,6 @@ import ckanext.showcase.logic.helpers as showcase_helpers
 from ckanext.showcase.model import setup as model_setup
 from ckanext.showcase.model import ShowcasePosition
 
-
-
 c = tk.c
 _ = tk._
 
