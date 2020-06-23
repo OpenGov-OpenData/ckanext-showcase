@@ -8,21 +8,21 @@
   border: 1px solid #0068a9;
   background-color: white;
   display: block;
-  padding-left: 30px;
+  padding-left: 40px;
   padding-right: 25px;
-
+  height: 62px;
 }
 
-span.grippy {
+.portal-nav-menu-admin__item span.grippy {
   position: absolute;
-  top: 15px;
+  top: 23px;
   left: 6px;
   content: '....';
   width: 10px;
-  height: 20px;
+  height: 30px;
   display: inline-block;
   overflow: hidden;
-  line-height: 5px;
+  line-height: 7px;
   padding: 3px 4px;
   cursor: grab;
   cursor: -moz-grab;
@@ -30,34 +30,39 @@ span.grippy {
   vertical-align: middle;
   margin-top: -.7em;
   margin-right: .3em;
-  font-size: 12px;
+  font-size: 20px;
   font-family: sans-serif;
   letter-spacing: 2px;
   color: #0068a9;;
+
 }
 
-span.grippy::after {
+.portal-nav-menu-admin__item span.grippy::after {
 content: '.. .. .. ..';
 }
 
-span.grippy.cursor-grabbing {
+.portal-nav-menu-admin__item span.grippy.cursor-grabbing {
   cursor: grabbing;
   cursor: -moz-grabbing;
   cursor: -webkit-grabbing;
 }
 
-h3.grippy {
+.portal-nav-menu-admin__item h3.grippy {
   color: black;
   cursor: grab;
   cursor: -moz-grab;
   cursor: -webkit-grab;
+  margin-bottom: 0;
 }
 
-h3.grippy.cursor-grabbing {
+.portal-nav-menu-admin__item h3.grippy.cursor-grabbing {
   cursor: grabbing;
   cursor: -moz-grabbing;
   cursor: -webkit-grabbing;
 }
+
 .portal-nav-menu-admin__item_link {
   color: #0068a9;
+  display: block;
+  margin-bottom: 8px;
 }

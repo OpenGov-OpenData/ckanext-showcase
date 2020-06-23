@@ -4,10 +4,10 @@
             <li class="portal-nav-menu-admin__item">
                 <input type="hidden" name="menu_item_name_{{ showcase.id }}" value="{{ showcase.position }}"/>
                 <h3 class="grippy">{{ showcase.title|truncate(80) }}
-                    <a class="portal-nav-menu-admin__item_link"
-                       href={{ showcase.url }}>{{ showcase.url|truncate(80) }}</a>
                 </h3>
-
+                {%  if showcase.url %}
+                <a class="portal-nav-menu-admin__item_link" href={{ showcase.url }}>{{ showcase.url|truncate(80) }}</a>
+                {% endif %}
                 <span class="grippy"></span>
             </li>
         {% endfor %}
