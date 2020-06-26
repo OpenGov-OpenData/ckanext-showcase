@@ -6,7 +6,7 @@
                 <h3 class="grippy">{{ showcase.title|truncate(80) }}
                 </h3>
                 {%  if showcase.url %}
-                <a class="portal-nav-menu-admin__item_link" href={{ showcase.url }}>{{ showcase.url|truncate(80) }}</a>
+                <a class="portal-nav-menu-admin__item_link" target="_blank" href={{ showcase.url }}>{{ showcase.url|truncate(80) }}</a>
                 {% endif %}
                 <span class="grippy"></span>
             </li>
