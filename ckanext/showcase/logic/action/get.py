@@ -8,7 +8,9 @@ from ckan.logic import NotAuthorized
 from ckanext.showcase.logic.schema import (showcase_package_list_schema,
                                            package_showcase_list_schema,
                                            organization_showcase_list_schema)
-from ckanext.showcase.model import ShowcasePackageAssociation, ShowcaseAdmin
+from ckanext.showcase.model import (ShowcasePackageAssociation,
+                                    ShowcaseAdmin,
+                                    ShowcasePosition)
 
 import logging
 log = logging.getLogger(__name__)
@@ -48,6 +50,30 @@ def showcase_list(context, data_dict):
     for pkg in q.all():
         showcase_list.append(model_dictize.package_dictize(pkg, context))
 
+    if len(showcase_list) > 0:
+        # reorder showcases based on positions
+        showcase_positions = ShowcasePosition.get_showcase_postions()
+        sorted_showcases = []
+        position = 0
+        if len(showcase_positions) > 0:
+            for showcase_id in showcase_positions:
+                showcase = next((item for item in showcase_list if item['id'] == showcase_id), False)
+                if showcase:
+                    showcase['position'] = position
+                    position = position+1
+                    sorted_showcases.append(showcase)
+            ordered_showcase_ids = set(d["id"] for d in sorted_showcases)
+            unordered_showcases = [d for d in showcase_list if d['id'] not in ordered_showcase_ids]
+            for showcase in unordered_showcases:
+                showcase['position'] = position
+                position = position+1
+                sorted_showcases.append(showcase)
+        else:
+            for showcase in showcase_list:
+                showcase['position'] = position
+                position = position+1
+                sorted_showcases.append(showcase)
+        showcase_list = sorted_showcases
     return showcase_list
 
 

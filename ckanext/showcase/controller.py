@@ -9,12 +9,14 @@ import ckan.lib.helpers as h
 import ckan.lib.navl.dictization_functions as dict_fns
 import ckan.logic as logic
 import ckan.plugins as p
+import ckan.lib.search as search
 from ckan.common import OrderedDict, ungettext
 from ckan.controllers.package import (PackageController,
                                       url_with_params,
                                       _encode_params)
 
-from ckanext.showcase.model import ShowcasePackageAssociation
+import ckanext.showcase.logic.helpers as showcasehelpers
+from ckanext.showcase.model import ShowcasePackageAssociation, ShowcasePosition
 from ckanext.showcase.plugin import DATASET_TYPE_NAME
 
 _ = tk._
@@ -602,3 +604,50 @@ class ShowcaseController(PackageController):
         c.user_dict = get_action('user_show')(data_dict={'id': user_id})
         c.user_id = user_id
         return render('admin/confirm_remove_showcase_admin.html')
+
+    def reorder(self, data=None, errors=None, error_summary=None):
+
+        context = {'model': model, 'session': model.Session,
+                   'user': c.user or c.author, 'auth_user_obj': c.userobj}
+
+        # Users allowed to create showcases can reorder showcase positions
+        try:
+            check_access('ckanext_showcase_create', context)
+        except NotAuthorized:
+            abort(401, _('Unauthorized to reorder packages'))
+
+        if p.toolkit.request.method == 'POST':
+            data = dict(p.toolkit.request.POST)
+            for k, v in data.items():
+                # Check if data key name starts with menu_item_name
+                if k.startswith('menu_item_name'):
+                    # split the key and get the showcase_id as the last element
+                    showcase_id = k.split('_')[-1]
+                    if ShowcasePosition.exists(showcase_id=showcase_id):
+                        position_obj = ShowcasePosition.get(showcase_id=showcase_id)
+                        position_obj.position = int(v)
+                        position_obj.commit()
+                    else:
+                        ShowcasePosition.create(showcase_id=showcase_id, position=int(v))
+                    #rebuild the search index on update/create of a showcase position
+                    search.rebuild(showcase_id)
+            h.flash_success(_('Showcase positions updated successfully'))
+            return redirect(h.url_for(
+                controller='ckanext.showcase.controller:ShowcaseController',
+                action='index'))
+
+        #get the current showcase position values in highest order first
+        showcase_positions = ShowcasePosition.get_showcase_postions()
+        showcases = showcasehelpers.get_recent_showcase_list()
+        sorted_showcases = []
+        position = 0
+        #iterate through the showcase_positions and assign the position value to respective showcase dict
+        for showcase_id in showcase_positions:
+            showcase = next((item for item in showcases if item['id'] == showcase_id), False)
+            if showcase:
+                showcase['position'] = position
+                position = position+1
+                sorted_showcases.append(showcase)
+
+        c.showcases = sorted_showcases
+        return render('showcase/reorder.html')

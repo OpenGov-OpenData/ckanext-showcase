@@ -14,6 +14,7 @@ log = logging.getLogger(__name__)
 
 showcase_package_assocation_table = None
 showcase_admin_table = None
+showcase_position_table = None
 
 
 def setup():
@@ -21,6 +22,11 @@ def setup():
     if showcase_package_assocation_table is None:
         define_showcase_package_association_table()
         log.debug('ShowcasePackageAssociation table defined in memory')
+
+    # setup showcase_position_table
+    if showcase_position_table is None:
+        define_showcase_position_table()
+        log.debug('ShowcasePosition table defined in memory')
 
     if model.package_table.exists():
         if not showcase_package_assocation_table.exists():
@@ -33,9 +39,39 @@ def setup():
             inspector = Inspector.from_engine(engine)
             columns = inspector.get_columns('showcase_package_association')
             column_names = [column['name'] for column in columns]
-            if not 'organization_id' in column_names:
+            if 'organization_id' not in column_names:
                 log.debug('ShowcasePackageAssociation table needs to be updated')
                 migrate_v2()
+
+        showcases_postions = []
+        if not showcase_position_table.exists():
+            showcase_position_table.create()
+            log.debug('ShowcasePosition table create')
+        else:
+            log.debug('ShowcasePosition table already exists')
+            showcases_postions = ShowcasePosition.get_showcase_postions()
+
+        if len(showcases_postions) == 0:
+            log.debug('Inserting default showcase position values.')
+            conn = Session.connection()
+            statement = """
+            SELECT id from package where type='showcase';
+            """
+            showcases = conn.execute(statement).fetchall()
+            showcases = [i for (i, ) in showcases]
+            position = 0
+            for showcase_id in showcases:
+                statement = """
+                INSERT INTO showcase_position (showcase_id,position)
+                VALUES (%s,%s);
+                """
+                data = (showcase_id,position)
+                conn.execute(statement,data)
+                position = position + 1
+
+            Session.commit()
+            log.info('Default showcase position values inserted')
+
     else:
         log.debug('ShowcasePackageAssociation table creation deferred')
 
@@ -172,7 +208,7 @@ def migrate_v2():
     log.debug('Migrating ShowcasePackageAssociation table to v2.')
     conn = Session.connection()
 
-    statements =  """
+    statements = """
     ALTER TABLE showcase_package_association
     ADD COLUMN organization_id text;
 
@@ -184,3 +220,26 @@ def migrate_v2():
     conn.execute(statements)
     Session.commit()
     log.info('ShowcasePackageAssociation table migrated to v2')
+
+
+class ShowcasePosition(ShowcaseBaseModel):
+    @classmethod
+    def get_showcase_postions(cls):
+        showcase_positions = [i for (i, ) in Session.query(cls.showcase_id).order_by(cls.position).all()]
+        return showcase_positions
+
+
+def define_showcase_position_table():
+    global showcase_position_table
+
+    showcase_position_table = Table(
+        'showcase_position', metadata,
+        Column('showcase_id', types.UnicodeText,
+               ForeignKey('package.id',
+                          ondelete='CASCADE',
+                          onupdate='CASCADE'),
+               primary_key=True, nullable=False),
+        Column('position', types.Integer,
+               primary_key=False, nullable=False))
+
+    mapper(ShowcasePosition, showcase_position_table)

@@ -1,0 +1,19 @@
+<form method="POST">
+    <ul class="portal-nav-menu-admin">
+        {% for showcase in showcases %}
+            <li class="portal-nav-menu-admin__item">
+                <input type="hidden" name="menu_item_name_{{ showcase.id }}" value="{{ showcase.position }}"/>
+                <h3 class="grippy">{{ showcase.title|truncate(80) }}
+                </h3>
+                {%  if showcase.url %}
+                <a class="portal-nav-menu-admin__item_link" target="_blank" href={{ showcase.url }}>{{ showcase.url|truncate(80) }}</a>
+                {% endif %}
+                <span class="grippy"></span>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <div class="form-actions">
+        <button class="btn btn-primary" name="save" type="submit">Save</button>
+    </div>
+</form>
