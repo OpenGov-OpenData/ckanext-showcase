@@ -155,7 +155,8 @@ class TestDatasetView(object):
         """
 
         sysadmin = factories.Sysadmin()
-        dataset = factories.Dataset(name="my-dataset")
+        org = factories.Organization()
+        dataset = factories.Dataset(name="my-dataset", owner_org=org["id"])
         showcase_one = factories.Dataset(
             name="my-first-showcase", type="showcase"
         )
@@ -170,12 +171,14 @@ class TestDatasetView(object):
             context=context,
             package_id=dataset["id"],
             showcase_id=showcase_one["id"],
+            organization_id=org["id"]
         )
         helpers.call_action(
             "ckanext_showcase_package_association_create",
             context=context,
             package_id=dataset["id"],
             showcase_id=showcase_two["id"],
+            organization_id=org["id"]
         )
 
         response = app.get(
@@ -196,7 +199,8 @@ class TestDatasetView(object):
             pytest.skip("submit_and_follow not supported")
 
         sysadmin = factories.Sysadmin()
-        dataset = factories.Dataset(name="my-dataset")
+        org = factories.Organization()
+        dataset = factories.Dataset(name="my-dataset", owner_org=org["id"])
         showcase_one = factories.Dataset(
             name="my-first-showcase", type="showcase"
         )
@@ -213,6 +217,7 @@ class TestDatasetView(object):
             context=context,
             package_id=dataset["id"],
             showcase_id=showcase_one["id"],
+            organization_id=org["id"]
         )
 
         response = app.get(
@@ -235,7 +240,8 @@ class TestDatasetView(object):
         """
 
         sysadmin = factories.Sysadmin()
-        dataset = factories.Dataset(name="my-dataset")
+        org = factories.Organization()
+        dataset = factories.Dataset(name="my-dataset", owner_org=org["id"])
         showcase_one = factories.Dataset(
             name="my-first-showcase", type="showcase"
         )
@@ -272,7 +278,8 @@ class TestDatasetView(object):
         """
 
         sysadmin = factories.Sysadmin()
-        dataset = factories.Dataset(name="my-dataset")
+        org = factories.Organization()
+        dataset = factories.Dataset(name="my-dataset", owner_org=org["id"])
         showcase_one = factories.Dataset(
             name="my-first-showcase", type="showcase"
         )
@@ -283,6 +290,7 @@ class TestDatasetView(object):
             context=context,
             package_id=dataset["id"],
             showcase_id=showcase_one["id"],
+            organization_id=org["id"]
         )
 
         assert model.Session.query(ShowcasePackageAssociation).count() == 1

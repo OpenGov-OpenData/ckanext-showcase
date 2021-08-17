@@ -73,7 +73,15 @@
         </h1>
 
         {% if pkg.image_display_url %}
-            <p class="ckanext-showcase-image-container"><img src="{{ pkg.image_display_url }}" alt="{{ name }}" class="media-image ckanext-showcase-image img-responsive"></p>
+          <p class="ckanext-showcase-image-container">
+            {% if pkg.url %}
+              <a class="ckanext-showcase-launch" href="{{ pkg.url }}" target="_blank">
+                <img src="{{ pkg.image_display_url }}" alt="{{ name }}" class="media-image ckanext-showcase-image img-responsive">
+              </a>
+            {% else %}
+              <img src="{{ pkg.image_display_url }}" alt="{{ name }}" class="media-image ckanext-showcase-image img-responsive">
+            {% endif %}
+          </p>
         {% endif %}
 
     {% block package_notes %}
@@ -89,7 +97,7 @@
     {% endblock %}
 
         {% if pkg.url %}
-            <p><a class="btn btn-primary ckanext-showcase-launch" href="{{ pkg.url }}" target="_blank"><i class="fa fa-external-link icon-external-link"></i> {{ _('Launch website') }}</a></p>
+            <p><a class="btn btn-primary ckanext-showcase-launch" href="{{ pkg.url }}" target="_blank"><i class="fa fa-external-link icon-external-link"></i> {{ _('Visit') }}</a></p>
         {% endif %}
 
     {% endblock %}

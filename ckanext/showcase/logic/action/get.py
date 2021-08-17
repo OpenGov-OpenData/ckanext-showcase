@@ -6,7 +6,8 @@ from ckan.lib.navl.dictization_functions import validate
 from ckan.logic import NotAuthorized
 
 from ckanext.showcase.logic.schema import (showcase_package_list_schema,
-                                           package_showcase_list_schema)
+                                           package_showcase_list_schema,
+                                           organization_showcase_list_schema)
 from ckanext.showcase.model import ShowcasePackageAssociation, ShowcaseAdmin
 
 import logging
@@ -126,6 +127,38 @@ def package_showcase_list(context, data_dict):
             context,
             {'q': q, 'fq': fq, 'rows': 100})
         showcase_list = _showcase_list['results']
+
+    return showcase_list
+
+
+@toolkit.side_effect_free
+def organization_showcase_list(context, data_dict):
+    '''List showcases associated with an organization.
+
+    :param organization_id: id or name of the organization
+    :type organization_id: string
+
+    :rtype: list of dictionaries
+    '''
+
+    toolkit.check_access('ckanext_organization_showcase_list', context, data_dict)
+
+    # validate the incoming data_dict
+    validated_data_dict, errors = validate(data_dict,
+                                           organization_showcase_list_schema(),
+                                           context)
+
+    if errors:
+        raise toolkit.ValidationError(errors)
+
+    # get a list of showcase ids associated with the organization id
+    showcase_id_list = ShowcasePackageAssociation.get_showcase_ids_for_organization(
+        validated_data_dict['organization_id'])
+
+    showcase_list = []
+    if showcase_id_list is not None:
+        for item in showcase_id_list:
+            showcase_list.append(item.showcase_id)
 
     return showcase_list
 

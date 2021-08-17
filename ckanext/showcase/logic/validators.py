@@ -42,3 +42,27 @@ def convert_package_name_or_id_to_id_for_type_showcase(package_name_or_id,
     return convert_package_name_or_id_to_id_for_type(package_name_or_id,
                                                      context,
                                                      package_type='showcase')
+
+
+def convert_organization_name_or_id_to_id(organization_name_or_id, context):
+    '''
+    Return the id for the given organization name or id.
+
+    Also validates that a organization with the given name or id exists.
+
+    :returns: the id of the organization with the given name or id
+    :rtype: string
+    :raises: ckan.lib.navl.dictization_functions.Invalid if there is no
+        organization with the given name or id
+
+    '''
+    session = context['session']
+    model = context['model']
+    result = session.query(model.Group) \
+        .filter_by(id=organization_name_or_id, type='organization').first()
+    if not result:
+        result = session.query(model.Group) \
+            .filter_by(name=organization_name_or_id, type='organization').first()
+    if not result:
+        raise Invalid('%s: %s' % (_('Not found'), _('Organization')))
+    return result.id

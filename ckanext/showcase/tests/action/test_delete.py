@@ -95,21 +95,24 @@ class TestDeleteShowcase(object):
         """
         sysadmin = factories.Sysadmin()
         context = {"user": sysadmin["name"]}
+        org = factories.Organization()
         showcase = factories.Dataset(type="showcase", name="my-showcase")
-        dataset_one = factories.Dataset(name="dataset-one")
-        dataset_two = factories.Dataset(name="dataset-two")
+        dataset_one = factories.Dataset(name="dataset-one", owner_org=org["id"])
+        dataset_two = factories.Dataset(name="dataset-two", owner_org=org["id"])
 
         helpers.call_action(
             "ckanext_showcase_package_association_create",
             context=context,
             package_id=dataset_one["id"],
             showcase_id=showcase["id"],
+            organization_id=org["id"]
         )
         helpers.call_action(
             "ckanext_showcase_package_association_create",
             context=context,
             package_id=dataset_two["id"],
             showcase_id=showcase["id"],
+            organization_id=org["id"]
         )
 
         assert model.Session.query(ShowcasePackageAssociation).count() == 2
@@ -130,21 +133,24 @@ class TestDeletePackage(object):
         """
         sysadmin = factories.Sysadmin()
         context = {"user": sysadmin["name"]}
+        org = factories.Organization()
         showcase = factories.Dataset(type="showcase", name="my-showcase")
-        dataset_one = factories.Dataset(name="dataset-one")
-        dataset_two = factories.Dataset(name="dataset-two")
+        dataset_one = factories.Dataset(name="dataset-one", owner_org=org["id"])
+        dataset_two = factories.Dataset(name="dataset-two", owner_org=org["id"])
 
         helpers.call_action(
             "ckanext_showcase_package_association_create",
             context=context,
             package_id=dataset_one["id"],
             showcase_id=showcase["id"],
+            organization_id=org["id"]
         )
         helpers.call_action(
             "ckanext_showcase_package_association_create",
             context=context,
             package_id=dataset_two["id"],
             showcase_id=showcase["id"],
+            organization_id=org["id"]
         )
 
         assert model.Session.query(ShowcasePackageAssociation).count() == 2
@@ -164,21 +170,24 @@ class TestDeletePackage(object):
         """
         sysadmin = factories.Sysadmin()
         context = {"user": sysadmin["name"]}
+        org = factories.Organization()
         showcase = factories.Dataset(type="showcase", name="my-showcase")
-        dataset_one = factories.Dataset(name="dataset-one")
-        dataset_two = factories.Dataset(name="dataset-two")
+        dataset_one = factories.Dataset(name="dataset-one", owner_org=org["id"])
+        dataset_two = factories.Dataset(name="dataset-two", owner_org=org["id"])
 
         helpers.call_action(
             "ckanext_showcase_package_association_create",
             context=context,
             package_id=dataset_one["id"],
             showcase_id=showcase["id"],
+            organization_id=org["id"]
         )
         helpers.call_action(
             "ckanext_showcase_package_association_create",
             context=context,
             package_id=dataset_two["id"],
             showcase_id=showcase["id"],
+            organization_id=org["id"]
         )
 
         assert model.Session.query(ShowcasePackageAssociation).count() == 2
@@ -227,7 +236,8 @@ class TestDeleteShowcasePackageAssociation(object):
         correctly deletes an association.
         """
         sysadmin = factories.User(sysadmin=True)
-        package_id = factories.Dataset()["id"]
+        organization_id = factories.Organization()["id"]
+        package_id = factories.Dataset(owner_org=organization_id)["id"]
         showcase_id = factories.Dataset(type="showcase")["id"]
 
         context = {"user": sysadmin["name"]}
@@ -236,6 +246,7 @@ class TestDeleteShowcasePackageAssociation(object):
             context=context,
             package_id=package_id,
             showcase_id=showcase_id,
+            organization_id=organization_id
         )
 
         # One association object created
@@ -246,6 +257,7 @@ class TestDeleteShowcasePackageAssociation(object):
             context=context,
             package_id=package_id,
             showcase_id=showcase_id,
+            organization_id=organization_id
         )
 
     def test_association_delete_attempt_with_non_existent_association(self):
@@ -254,7 +266,8 @@ class TestDeleteShowcasePackageAssociation(object):
         but aren't associated with each other), will cause a NotFound error.
         """
         sysadmin = factories.User(sysadmin=True)
-        package_id = factories.Dataset()["id"]
+        organization_id = factories.Organization()["id"]
+        package_id = factories.Dataset(owner_org=organization_id)["id"]
         showcase_id = factories.Dataset(type="showcase")["id"]
 
         # No existing associations
@@ -267,6 +280,7 @@ class TestDeleteShowcasePackageAssociation(object):
                 context=context,
                 package_id=package_id,
                 showcase_id=showcase_id,
+                organization_id=organization_id
             )
 
     def test_association_delete_attempt_with_bad_package_ids(self):
@@ -286,6 +300,7 @@ class TestDeleteShowcasePackageAssociation(object):
                 context=context,
                 package_id="my-bad-package-id",
                 showcase_id="my-bad-showcase-id",
+                organization_id="my-bad-organization-id"
             )
 
     def test_association_delete_retains_packages(self):
@@ -293,7 +308,8 @@ class TestDeleteShowcasePackageAssociation(object):
         Deleting a sc/pkg association doesn't delete the associated packages.
         """
         sysadmin = factories.User(sysadmin=True)
-        package_id = factories.Dataset()["id"]
+        organization_id = factories.Organization()["id"]
+        package_id = factories.Dataset(owner_org=organization_id)["id"]
         showcase_id = factories.Dataset(type="showcase")["id"]
 
         context = {"user": sysadmin["name"]}
@@ -302,6 +318,7 @@ class TestDeleteShowcasePackageAssociation(object):
             context=context,
             package_id=package_id,
             showcase_id=showcase_id,
+            organization_id=organization_id
         )
 
         helpers.call_action(

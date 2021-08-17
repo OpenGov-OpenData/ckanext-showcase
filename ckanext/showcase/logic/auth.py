@@ -18,6 +18,7 @@ def get_auth_functions():
         'ckanext_showcase_package_association_delete': package_association_delete,
         'ckanext_showcase_package_list': showcase_package_list,
         'ckanext_package_showcase_list': package_showcase_list,
+        'ckanext_organization_showcase_list': organization_showcase_list,
         'ckanext_showcase_admin_add': add_showcase_admin,
         'ckanext_showcase_admin_remove': remove_showcase_admin,
         'ckanext_showcase_admin_list': showcase_admin_list,
@@ -99,6 +100,10 @@ def package_showcase_list(context, data_dict):
     '''All users can access a packages's showcase list'''
     return {'success': True}
 
+@toolkit.auth_allow_anonymous_access
+def organization_showcase_list(context, data_dict):
+    '''All users can access a organization's showcase list'''
+    return {'success': True}
 
 def add_showcase_admin(context, data_dict):
     '''Only sysadmins can add users to showcase admin list.'''

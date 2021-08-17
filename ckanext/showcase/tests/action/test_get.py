@@ -71,8 +71,9 @@ class TestShowcaseShow(object):
         sysadmin = factories.User(sysadmin=True)
 
         my_showcase = factories.Dataset(type="showcase", name="my-showcase")
-        package_one = factories.Dataset()
-        package_two = factories.Dataset()
+        org = factories.Organization()
+        package_one = factories.Dataset(owner_org=org["id"])
+        package_two = factories.Dataset(owner_org=org["id"])
 
         context = {"user": sysadmin["name"]}
         # create an association
@@ -81,12 +82,14 @@ class TestShowcaseShow(object):
             context=context,
             package_id=package_one["id"],
             showcase_id=my_showcase["id"],
+            organization_id=org["id"]
         )
         helpers.call_action(
             "ckanext_showcase_package_association_create",
             context=context,
             package_id=package_two["id"],
             showcase_id=my_showcase["id"],
+            organization_id=org["id"]
         )
 
         showcase_shown = helpers.call_action(
@@ -105,9 +108,10 @@ class TestShowcaseShow(object):
         sysadmin = factories.User(sysadmin=True)
 
         my_showcase = factories.Dataset(type="showcase", name="my-showcase")
-        package_one = factories.Dataset()
-        package_two = factories.Dataset()
-        package_three = factories.Dataset()
+        org = factories.Organization()
+        package_one = factories.Dataset(owner_org=org["id"])
+        package_two = factories.Dataset(owner_org=org["id"])
+        package_three = factories.Dataset(owner_org=org["id"])
 
         context = {"user": sysadmin["name"]}
         # create the associations
@@ -116,18 +120,21 @@ class TestShowcaseShow(object):
             context=context,
             package_id=package_one["id"],
             showcase_id=my_showcase["id"],
+            organization_id=org["id"]
         )
         helpers.call_action(
             "ckanext_showcase_package_association_create",
             context=context,
             package_id=package_two["id"],
             showcase_id=my_showcase["id"],
+            organization_id=org["id"]
         )
         helpers.call_action(
             "ckanext_showcase_package_association_create",
             context=context,
             package_id=package_three["id"],
             showcase_id=my_showcase["id"],
+            organization_id=org["id"]
         )
 
         # delete the first package
@@ -154,8 +161,9 @@ class TestShowcaseShow(object):
 
         showcase_one = factories.Dataset(type="showcase", name="showcase-one")
         showcase_two = factories.Dataset(type="showcase", name="showcase-two")
-        package_one = factories.Dataset()
-        package_two = factories.Dataset()
+        org = factories.Organization()
+        package_one = factories.Dataset(owner_org=org["id"])
+        package_two = factories.Dataset(owner_org=org["id"])
 
         admin_context = {"user": sysadmin["name"]}
 
@@ -165,24 +173,28 @@ class TestShowcaseShow(object):
             context=admin_context,
             package_id=package_one["id"],
             showcase_id=showcase_one["id"],
+            organization_id=org["id"]
         )
         helpers.call_action(
             "ckanext_showcase_package_association_create",
             context=admin_context,
             package_id=package_one["id"],
             showcase_id=showcase_two["id"],
+            organization_id=org["id"]
         )
         helpers.call_action(
             "ckanext_showcase_package_association_create",
             context=admin_context,
             package_id=package_two["id"],
             showcase_id=showcase_one["id"],
+            organization_id=org["id"]
         )
         helpers.call_action(
             "ckanext_showcase_package_association_create",
             context=admin_context,
             package_id=package_two["id"],
             showcase_id=showcase_two["id"],
+            organization_id=org["id"]
         )
 
         # delete one of the associated showcases
@@ -304,7 +316,8 @@ class TestShowcasePackageList(object):
         """
         sysadmin = factories.User(sysadmin=True)
 
-        package = factories.Dataset()
+        org = factories.Organization()
+        package = factories.Dataset(owner_org=org["id"])
         showcase_id = factories.Dataset(type="showcase")["id"]
         context = {"user": sysadmin["name"]}
         # create an association
@@ -313,6 +326,7 @@ class TestShowcasePackageList(object):
             context=context,
             package_id=package["id"],
             showcase_id=showcase_id,
+            organization_id=org["id"]
         )
 
         pkg_list = helpers.call_action(
@@ -331,8 +345,9 @@ class TestShowcasePackageList(object):
         """
         sysadmin = factories.User(sysadmin=True)
 
-        package_one = factories.Dataset()
-        package_two = factories.Dataset()
+        org = factories.Organization()
+        package_one = factories.Dataset(owner_org=org["id"])
+        package_two = factories.Dataset(owner_org=org["id"])
         showcase_id = factories.Dataset(type="showcase")["id"]
         context = {"user": sysadmin["name"]}
         # create first association
@@ -341,6 +356,7 @@ class TestShowcasePackageList(object):
             context=context,
             package_id=package_one["id"],
             showcase_id=showcase_id,
+            organization_id=org["id"]
         )
         # create second association
         helpers.call_action(
@@ -348,6 +364,7 @@ class TestShowcasePackageList(object):
             context=context,
             package_id=package_two["id"],
             showcase_id=showcase_id,
+            organization_id=org["id"]
         )
 
         pkg_list = helpers.call_action(
@@ -366,9 +383,10 @@ class TestShowcasePackageList(object):
         """
         sysadmin = factories.User(sysadmin=True)
 
-        package_one = factories.Dataset()
-        package_two = factories.Dataset()
-        package_three = factories.Dataset()
+        org = factories.Organization()
+        package_one = factories.Dataset(owner_org=org["id"])
+        package_two = factories.Dataset(owner_org=org["id"])
+        package_three = factories.Dataset(owner_org=org["id"])
         showcase_id = factories.Dataset(type="showcase")["id"]
         context = {"user": sysadmin["name"]}
         # create first association
@@ -377,6 +395,7 @@ class TestShowcasePackageList(object):
             context=context,
             package_id=package_one["id"],
             showcase_id=showcase_id,
+            organization_id=org["id"]
         )
         # create second association
         helpers.call_action(
@@ -384,6 +403,7 @@ class TestShowcasePackageList(object):
             context=context,
             package_id=package_two["id"],
             showcase_id=showcase_id,
+            organization_id=org["id"]
         )
         # create third association
         helpers.call_action(
@@ -391,6 +411,7 @@ class TestShowcasePackageList(object):
             context=context,
             package_id=package_three["id"],
             showcase_id=showcase_id,
+            organization_id=org["id"]
         )
 
         # delete the first package
@@ -420,7 +441,8 @@ class TestShowcasePackageList(object):
         """
         sysadmin = factories.User(sysadmin=True)
 
-        package = factories.Dataset()
+        org = factories.Organization()
+        package = factories.Dataset(owner_org=org["id"])
         showcase_id = factories.Dataset(type="showcase")["id"]
         context = {"user": sysadmin["name"]}
         # create an association
@@ -429,6 +451,7 @@ class TestShowcasePackageList(object):
             context=context,
             package_id=package["id"],
             showcase_id=showcase_id,
+            organization_id=org["id"]
         )
 
         with pytest.raises(toolkit.ValidationError):
@@ -487,7 +510,8 @@ class TestPackageShowcaseList(object):
         """
         sysadmin = factories.User(sysadmin=True)
 
-        package = factories.Dataset()
+        org = factories.Organization()
+        package = factories.Dataset(owner_org=org["id"])
         showcase = factories.Dataset(type="showcase")
         context = {"user": sysadmin["name"]}
         # create an association
@@ -496,6 +520,7 @@ class TestPackageShowcaseList(object):
             context=context,
             package_id=package["id"],
             showcase_id=showcase["id"],
+            organization_id=org["id"]
         )
 
         showcase_list = helpers.call_action(
@@ -514,7 +539,8 @@ class TestPackageShowcaseList(object):
         """
         sysadmin = factories.User(sysadmin=True)
 
-        package = factories.Dataset()
+        org = factories.Organization()
+        package = factories.Dataset(owner_org=org["id"])
         showcase_one = factories.Dataset(type="showcase")
         showcase_two = factories.Dataset(type="showcase")
         context = {"user": sysadmin["name"]}
@@ -524,6 +550,7 @@ class TestPackageShowcaseList(object):
             context=context,
             package_id=package["id"],
             showcase_id=showcase_one["id"],
+            organization_id=org["id"]
         )
         # create second association
         helpers.call_action(
@@ -531,6 +558,7 @@ class TestPackageShowcaseList(object):
             context=context,
             package_id=package["id"],
             showcase_id=showcase_two["id"],
+            organization_id=org["id"]
         )
 
         showcase_list = helpers.call_action(
@@ -550,7 +578,8 @@ class TestPackageShowcaseList(object):
         """
         sysadmin = factories.User(sysadmin=True)
 
-        package = factories.Dataset()
+        org = factories.Organization()
+        package = factories.Dataset(owner_org=org["id"])
         showcase = factories.Dataset(type="showcase")
         context = {"user": sysadmin["name"]}
         # create an association
@@ -559,6 +588,7 @@ class TestPackageShowcaseList(object):
             context=context,
             package_id=package["id"],
             showcase_id=showcase["id"],
+            organization_id=org["id"]
         )
 
         with pytest.raises(toolkit.ValidationError):

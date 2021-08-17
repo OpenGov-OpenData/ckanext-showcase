@@ -19,3 +19,12 @@ ckeditor-content-css:
     - ckeditor-content-style.css
   output: showcase/%(version)s_ckeditor-content-style.css
   filter: cssrewrite
+
+slick-js:
+  filter: rjsmin
+  output: showcase/%(version)s_slick.js
+  extra:
+    preload:
+      - base/main
+  contents:
+    - js/slick.js

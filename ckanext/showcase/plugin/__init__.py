@@ -127,6 +127,9 @@ class ShowcasePlugin(
             'facet_remove_field': showcase_helpers.facet_remove_field,
             'get_site_statistics': showcase_helpers.get_site_statistics,
             'get_wysiwyg_editor': showcase_helpers.get_wysiwyg_editor,
+            'get_recent_showcase_list': showcase_helpers.get_recent_showcase_list,
+            'get_package_showcase_list': showcase_helpers.get_package_showcase_list,
+            'get_value_from_showcase_extras': showcase_helpers.get_value_from_showcase_extras
         }
 
     # IFacets
@@ -181,6 +184,8 @@ class ShowcasePlugin(
             pkg_dict[u'showcase_notes_formatted'] = \
                 h.render_markdown(pkg_dict['notes'])
 
+        # Add redirect_link flag
+        pkg_dict[u'redirect_link'] = pkg_dict.get('redirect_link', False)
         return pkg_dict
 
     def after_show(self, context, pkg_dict):

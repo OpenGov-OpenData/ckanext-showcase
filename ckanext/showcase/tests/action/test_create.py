@@ -137,7 +137,8 @@ class TestCreateShowcasePackageAssociation(object):
         creates an association.
         """
         sysadmin = factories.User(sysadmin=True)
-        package_id = factories.Dataset()["id"]
+        organization_id = factories.Organization()["id"]
+        package_id = factories.Dataset(owner_org=organization_id)["id"]
         showcase_id = factories.Dataset(type="showcase")["id"]
 
         context = {"user": sysadmin["name"]}
@@ -146,6 +147,7 @@ class TestCreateShowcasePackageAssociation(object):
             context=context,
             package_id=package_id,
             showcase_id=showcase_id,
+            organization_id=organization_id
         )
 
         # One association object created
@@ -160,7 +162,8 @@ class TestCreateShowcasePackageAssociation(object):
         creates an association.
         """
         sysadmin = factories.User(sysadmin=True)
-        package = factories.Dataset()
+        org = factories.Organization()
+        package = factories.Dataset(owner_org=org["id"])
         package_name = package["name"]
         showcase = factories.Dataset(type="showcase")
         showcase_name = showcase["name"]
@@ -171,6 +174,7 @@ class TestCreateShowcasePackageAssociation(object):
             context=context,
             package_id=package_name,
             showcase_id=showcase_name,
+            organization_id=org["id"]
         )
 
         assert model.Session.query(ShowcasePackageAssociation).count() == 1
@@ -183,7 +187,8 @@ class TestCreateShowcasePackageAssociation(object):
         Error.
         """
         sysadmin = factories.User(sysadmin=True)
-        package_id = factories.Dataset()["id"]
+        organization_id = factories.Organization()["id"]
+        package_id = factories.Dataset(owner_org=organization_id)["id"]
         showcase_id = factories.Dataset(type="showcase")["id"]
 
         context = {"user": sysadmin["name"]}
@@ -193,6 +198,7 @@ class TestCreateShowcasePackageAssociation(object):
             context=context,
             package_id=package_id,
             showcase_id=showcase_id,
+            organization_id=organization_id
         )
         # Attempted duplicate creation results in ValidationError
         with pytest.raises(toolkit.ValidationError):
@@ -201,6 +207,7 @@ class TestCreateShowcasePackageAssociation(object):
                 context=context,
                 package_id=package_id,
                 showcase_id=showcase_id,
+                organization_id=organization_id
             )
 
 

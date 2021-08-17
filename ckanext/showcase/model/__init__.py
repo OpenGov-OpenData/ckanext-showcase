@@ -2,6 +2,7 @@ from sqlalchemy import Table
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import types
+from sqlalchemy.engine.reflection import Inspector
 
 from ckan.model.domain_object import DomainObject
 from ckan.model.meta import metadata, mapper, Session
@@ -27,6 +28,14 @@ def setup():
             log.debug('ShowcasePackageAssociation table create')
         else:
             log.debug('ShowcasePackageAssociation table already exists')
+            # Check if existing tables need to be updated
+            from ckan.model.meta import engine
+            inspector = Inspector.from_engine(engine)
+            columns = inspector.get_columns('showcase_package_association')
+            column_names = [column['name'] for column in columns]
+            if not 'organization_id' in column_names:
+                log.debug('ShowcasePackageAssociation table needs to be updated')
+                migrate_v2()
     else:
         log.debug('ShowcasePackageAssociation table creation deferred')
 
@@ -92,6 +101,16 @@ class ShowcasePackageAssociation(ShowcaseBaseModel):
                 package_id=package_id).all()
         return showcase_package_association_list
 
+    @classmethod
+    def get_showcase_ids_for_organization(cls, organization_id):
+        '''
+        Return a list of showcase ids associated with the passed organization_id.
+        '''
+        showcase_organization_association_list = \
+            Session.query(cls.showcase_id).filter_by(
+                organization_id=organization_id).distinct()
+        return showcase_organization_association_list
+
 
 def define_showcase_package_association_table():
     global showcase_package_assocation_table
@@ -107,7 +126,12 @@ def define_showcase_package_association_table():
                ForeignKey('package.id',
                           ondelete='CASCADE',
                           onupdate='CASCADE'),
-               primary_key=True, nullable=False)
+               primary_key=True, nullable=False),
+        Column('organization_id', types.UnicodeText,
+               ForeignKey('group.id',
+                          ondelete='CASCADE',
+                          onupdate='CASCADE'),
+               primary_key=True, nullable=True)
     )
 
     mapper(ShowcasePackageAssociation, showcase_package_assocation_table)
@@ -142,3 +166,21 @@ def define_showcase_admin_table():
                                         primary_key=True, nullable=False))
 
     mapper(ShowcaseAdmin, showcase_admin_table)
+
+
+def migrate_v2():
+    log.debug('Migrating ShowcasePackageAssociation table to v2.')
+    conn = Session.connection()
+
+    statements =  """
+    ALTER TABLE showcase_package_association
+    ADD COLUMN organization_id text;
+
+    UPDATE showcase_package_association spa
+    SET organization_id = p.owner_org
+    FROM package p
+    WHERE spa.package_id = p.id;
+    """
+    conn.execute(statements)
+    Session.commit()
+    log.info('ShowcasePackageAssociation table migrated to v2')

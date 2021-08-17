@@ -55,6 +55,11 @@ def showcase_package_association_create(context, data_dict):
     toolkit.check_access('ckanext_showcase_package_association_create',
                          context, data_dict)
 
+    # get organization id for package
+    pkg_dict = toolkit.get_action('package_show')(context, {'id': data_dict.get('package_id')})
+    if pkg_dict.get('organization'):
+        data_dict['organization_id'] = pkg_dict.get('organization', {}).get('id')
+
     # validate the incoming data_dict
     validated_data_dict, errors = validate(
         data_dict, showcase_package_association_create_schema(), context)
@@ -62,9 +67,10 @@ def showcase_package_association_create(context, data_dict):
     if errors:
         raise toolkit.ValidationError(errors)
 
-    package_id, showcase_id = toolkit.get_or_bust(validated_data_dict,
-                                                  ['package_id',
-                                                   'showcase_id'])
+    package_id, showcase_id, organization_id = toolkit.get_or_bust(validated_data_dict,
+                                                                   ['package_id',
+                                                                    'showcase_id',
+                                                                    'organization_id'])
 
     if ShowcasePackageAssociation.exists(package_id=package_id,
                                          showcase_id=showcase_id):
@@ -73,7 +79,8 @@ def showcase_package_association_create(context, data_dict):
 
     # create the association
     return ShowcasePackageAssociation.create(package_id=package_id,
-                                             showcase_id=showcase_id)
+                                             showcase_id=showcase_id,
+                                             organization_id=organization_id)
 
 
 def showcase_admin_add(context, data_dict):
