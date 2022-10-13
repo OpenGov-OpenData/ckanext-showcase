@@ -1,5 +1,34 @@
 # Ckanext-showcase CHANGELOG
 
+## v1.5.1 2022-08-10
+
+* Dependency update
+
+## v1.5.0 2022-04-20
+
+* Support for CKAN 2.10 (#143)
+* Fix message in Add to showcase button (#139)
+
+## v1.4.8 2022-01-17
+
+* Add Chinese (Traditional, Taiwan) translations (#136)
+* Dependency update
+
+## v1.4.7 2022-01-04
+
+* Fix ReST in README (#133)
+* Move minimal requirements into setup.py (#134)
+
+## v1.4.6 2022-01-04
+
+* Fix version in setup.py and add to changelog (#130)
+
+## v1.4.5 2021-11.25
+
+* Add German and French translations (#124, #126)
+* Fix logic for API routes (#128)
+* Dependency updates
+
 ## v1.4.4 2021-08-17
 
 * Fix hardcoded route (#118)
