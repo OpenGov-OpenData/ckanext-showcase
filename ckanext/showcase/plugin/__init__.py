@@ -191,7 +191,7 @@ class ShowcasePlugin(
         '''
         Modify pkg_dict that is sent to templates.
         '''
-        context = {'user': tk.g.user or tk.g.author}
+        context = {'user': tk.c.user or tk.c.author}
 
         return self._add_to_pkg_dict(context, pkg_dict)
 
