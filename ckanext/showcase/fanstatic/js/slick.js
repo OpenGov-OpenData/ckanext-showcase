@@ -527,7 +527,7 @@ $(this).find("a").first().attr({
             _.$slides.wrapAll('<div class="slick-track"/>').parent();
 
         _.$list = _.$slideTrack.wrap(
-            '<div aria-live="polite" class="slick-list"/>').parent();
+            '<div class="slick-list"/>').parent();
         _.$slideTrack.css('opacity', 0);
 
         if (_.options.centerMode === true || _.options.swipeToSlide === true) {
@@ -2573,11 +2573,9 @@ $(this).find("a").first().attr({
             'tabindex': '-1'
         });
 
-        _.$slideTrack.attr('role', 'listbox');
-
         _.$slides.not(_.$slideTrack.find('.slick-cloned')).each(function(i) {
             $(this).attr({
-                'role': 'option',
+                'role': 'tabpanel',
                 'aria-labelledby': 'slick-slide' + _.instanceUid + i + ''
             });
             $(this).find("h3").first().attr({
@@ -2611,8 +2609,7 @@ $(this).find("a").first().attr({
         // _isSlideOnFocus = _.$slides.is(':focus') || _.$slides.find('*').is(':focus');
 
         _.$slideTrack.find('.slick-active').attr({
-            'aria-hidden': 'false',
-            'tabindex': '0'
+            'aria-hidden': 'false'
         }).find('a, input, button, select').attr({
             'tabindex': '0'
         });
