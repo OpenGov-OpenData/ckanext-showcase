@@ -67,3 +67,16 @@ jobs:
       uses: codecov/codecov-action@v1
       with:
         file: ./coverage.xml
+    
+    - name: SonarQube Scan
+      uses: sonarsource/sonarqube-scan-action@master
+      with: 
+        args: >
+          -Dsonar.projectKey=ckanext-showcase
+          -Dsonar.sources=ckanext/showcase
+          -Dsonar.tests=ckanext/showcase/tests
+          -Dsonar.exclusions=ckanext/showcase/tests/**
+          -Dsonar.python.coverage.reportPaths=coverage.xml
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_API_TOKEN }}
+        SONAR_HOST_URL: ${{ secrets.SONAR_EXTERNAL_URL }}
