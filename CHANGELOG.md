@@ -1,5 +1,32 @@
 # Ckanext-showcase CHANGELOG
 
+## v1.8.1 2025-01-29
+
+*  Fixes delete and update showcase buttons (#173)
+*  Update MANIFEST.in to include migration files and public assets (#174)
+
+## v1.8.0 2025-01-28
+
+* Add CKAN 2.11 support (#170) 
+
+## v1.7.0 2024-04-17
+
+* Fix navigation menu headers (#169)
+* Add English Australia (en_AU) translation files (#168)
+
+## v1.6.1 2023-06-15
+* Fixed BS5 class and add CSRF support to all forms (#167)
+* String prefix cleanup (#165)
+
+## v1.6.0 2023-02-14
+
+* Dropped support for CKAN 2.7 and 2.8
+* Dropped support for Python 2
+* Add support for CSRF token
+* Sanitize blueprint names. All views should be called using `showcase_blueprint.<endpoint>`
+* Rename get_showcase_wysiwyg_editor to avoid name clashes with other extensions (like `ckanext-pages`)
+* Update CKEditor to it's latest version: 36.0.1
+
 ## v1.5.1 2022-08-10
 
 * Dependency update
