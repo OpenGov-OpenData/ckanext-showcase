@@ -2,6 +2,16 @@
 
 {% set showcase_route = 'showcase_blueprint.index' %}
 
+{% block header_account_logged %}
+  <li>
+    <a href="{{ h.url_for(showcase_route) }}" title="{{ _('Showcases') }}">
+      <i class="fa fa-trophy"></i>
+    </a>
+  </li>
+  {{ super() }}
+{% endblock %}
+
+
 {% block header_site_navigation_tabs %}
   {{ super() }}
   {{ h.build_nav_main((showcase_route, _('Showcases'))) }}
