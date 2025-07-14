@@ -16,7 +16,7 @@ import logging
 log = logging.getLogger(__name__)
 
 
-@pytest.mark.usefixtures("clean_db", "clean_index")
+@pytest.mark.usefixtures("with_plugins", "clean_db", "clean_index")
 class TestShowcaseIndex(object):
     def test_showcase_listed_on_index(self, app):
         """
@@ -30,7 +30,7 @@ class TestShowcaseIndex(object):
         assert "my-showcase" in response.body
 
 
-@pytest.mark.usefixtures("clean_db", "clean_index")
+@pytest.mark.usefixtures("with_plugins", "clean_db", "clean_index")
 class TestShowcaseNewView(object):
     def test_showcase_create_form_renders(self, app):
 
@@ -42,39 +42,30 @@ class TestShowcaseNewView(object):
 
     def test_showcase_new_redirects_to_manage_datasets(self, app):
         """Creating a new showcase redirects to the manage datasets form."""
-        if tk.check_ckan_version("2.9"):
-            pytest.skip("submit_and_follow not supported")
-
         sysadmin = factories.Sysadmin()
         # need a dataset for the 'bulk_action.showcase_add' button to show
         factories.Dataset()
 
         env = {"REMOTE_USER": sysadmin["name"].encode("ascii")}
-        response = app.get(url=url_for("showcase_new"), extra_environ=env,)
+        response = app.post(
+            url=url_for("showcase_blueprint.new"),
+            extra_environ=env,
+            data={"name": "my-showcase"},
+            follow_redirects=False
+            )
 
-        # create showcase
-        form = response.forms["dataset-edit"]
-        form["name"] = u"my-showcase"
-        create_response = helpers.submit_and_follow(app, form, env, "save")
-
-        # Unique to manage_datasets page
-        assert "bulk_action.showcase_add" in create_response
         # Requested page is the manage_datasets url.
         assert (
-            url_for("showcase_manage_datasets", id="my-showcase")
-            == create_response.request.path
+            url_for("showcase_blueprint.manage_datasets", id="my-showcase")
+            in response.location
         )
 
     def test_create_showcase(self, app):
-        if not tk.check_ckan_version(min_version='2.9.0'):
-            # Remove when dropping support for 2.8
-            pytest.skip("data argument not supported in post()")
-
         sysadmin = factories.Sysadmin()
 
         env = {"REMOTE_USER": sysadmin["name"].encode("ascii")}
         app.post(
-            url=url_for("showcase_new"),
+            url=url_for("showcase_blueprint.new"),
             extra_environ=env,
             data={
                 "name": "my-test-showcase",
@@ -84,7 +75,7 @@ class TestShowcaseNewView(object):
             )
 
         res = app.get(
-            url=url_for("showcase_read", id="my-test-showcase"),
+            url=url_for("showcase_blueprint.read", id="my-test-showcase"),
             extra_environ=env,
         )
         assert "my-test-showcase" in res.body
@@ -92,7 +83,7 @@ class TestShowcaseNewView(object):
 
 
 
-@pytest.mark.usefixtures("clean_db", "clean_index")
+@pytest.mark.usefixtures("with_plugins", "clean_db", "clean_index")
 class TestShowcaseEditView(object):
     def test_showcase_edit_form_renders(self, app):
         """
@@ -133,16 +124,12 @@ class TestShowcaseEditView(object):
         )
 
     def test_edit_showcase(self, app):
-        if not tk.check_ckan_version(min_version='2.9.0'):
-            # Remove when dropping support for 2.8
-            pytest.skip("data argument not supported in post()")
-
         sysadmin = factories.Sysadmin()
         factories.Dataset(name="my-showcase", type="showcase")
         env = {"REMOTE_USER": sysadmin["name"]}
 
         app.post(
-            url=url_for("showcase_edit", id="my-showcase"),
+            url=url_for("showcase_blueprint.edit", id="my-showcase"),
             extra_environ=env,
             data={
                 "name": "my-edited-showcase",
@@ -151,14 +138,14 @@ class TestShowcaseEditView(object):
             }
         )
         res = app.get(
-            url=url_for("showcase_edit", id="my-edited-showcase"),
+            url=url_for("showcase_blueprint.edit", id="my-edited-showcase"),
             extra_environ=env,
         )
         assert "my-edited-showcase" in res.body
         assert "My new description!" in res.body
 
 
-@pytest.mark.usefixtures("clean_db", "clean_index")
+@pytest.mark.usefixtures("with_plugins", "clean_db", "clean_index")
 class TestDatasetView(object):
 
     """Plugin adds a new showcases view for datasets."""
@@ -170,12 +157,8 @@ class TestDatasetView(object):
 
         dataset = factories.Dataset(name="my-dataset")
 
-        if tk.check_ckan_version("2.9"):
-            url = url = url_for("dataset.read", id=dataset["id"])
-        else:
-            url = url_for(
-                controller="package", action="read", id=dataset["id"]
-            )
+        url = url = url_for("dataset.read", id=dataset["id"])
+
         response = app.get(url)
         # response contains link to dataset's showcase list
         assert "/dataset/showcases/{0}".format(dataset["name"]) in response
@@ -188,7 +171,7 @@ class TestDatasetView(object):
         dataset = factories.Dataset(name="my-dataset")
 
         response = app.get(
-            url=url_for("showcase_dataset_showcase_list", id=dataset["id"])
+            url=url_for("showcase_blueprint.dataset_showcase_list", id=dataset["id"])
         )
 
         assert (
@@ -233,7 +216,7 @@ class TestDatasetView(object):
         )
 
         response = app.get(
-            url=url_for("showcase_dataset_showcase_list", id=dataset["id"])
+            url=url_for("showcase_blueprint.dataset_showcase_list", id=dataset["id"])
         )
 
         assert len(BeautifulSoup(response.body).select("li.media-item")) == 2
@@ -246,9 +229,6 @@ class TestDatasetView(object):
         Add to showcase dropdown only lists showcases that aren't already
         associated with dataset.
         """
-        if tk.check_ckan_version("2.9"):
-            pytest.skip("submit_and_follow not supported")
-
         sysadmin = factories.Sysadmin()
         org = factories.Organization()
         dataset = factories.Dataset(name="my-dataset", owner_org=org["id"])
@@ -272,19 +252,15 @@ class TestDatasetView(object):
         )
 
         response = app.get(
-            url=url_for("showcase_dataset_showcase_list", id=dataset["id"]),
+            url=url_for("showcase_blueprint.dataset_showcase_list", id=dataset["id"]),
             extra_environ={"REMOTE_USER": str(sysadmin["name"])},
         )
 
-        showcase_add_form = response.forms["showcase-add"]
-        showcase_added_options = [
-            value for (value, _) in showcase_add_form["showcase_added"].options
-        ]
-        assert showcase_one["id"] not in showcase_added_options
-        assert showcase_two["id"] in showcase_added_options
-        assert showcase_three["id"] in showcase_added_options
+        assert f'<option value="{showcase_one["id"]}' not in response.body
+        assert f'<option value="{showcase_two["id"]}' in response.body
+        assert f'<option value="{showcase_three["id"]}' in response.body
 
-    def test_dataset_showcase_page_add_to_showcase_dropdown_submit(self, app):
+    def test_dataset_showcase_page_add_showcase_button_submit(self, app):
         """
         Submitting 'Add to showcase' form with selected showcase value creates
         a sc/pkg association.
@@ -300,25 +276,18 @@ class TestDatasetView(object):
         factories.Dataset(name="my-third-showcase", type="showcase")
 
         assert model.Session.query(ShowcasePackageAssociation).count() == 0
-        if tk.check_ckan_version("2.9"):
-            pytest.skip("submit_and_follow not supported")
 
         env = {"REMOTE_USER": sysadmin["name"].encode("ascii")}
 
-        response = app.get(
-            url=url_for("showcase_dataset_showcase_list", id=dataset["id"]),
+        response = app.post(
+            url=url_for("showcase_blueprint.dataset_showcase_list", id=dataset["id"]),
+            data={"showcase_added": showcase_one["id"]},
             extra_environ=env,
         )
 
-        form = response.forms["showcase-add"]
-        form["showcase_added"] = showcase_one["id"]
-        showcase_add_response = helpers.submit_and_follow(app, form, env)
+        # Flash message containing confirmation
+        assert "The dataset has been added to the showcase" in response.body
 
-        # returns to the correct page
-        assert (
-            showcase_add_response.request.path
-            == "/dataset/showcases/my-dataset"
-        )
         # an association is created
         assert model.Session.query(ShowcasePackageAssociation).count() == 1
 
@@ -345,29 +314,23 @@ class TestDatasetView(object):
         )
 
         assert model.Session.query(ShowcasePackageAssociation).count() == 1
-        if tk.check_ckan_version("2.9"):
-            pytest.skip("submit_and_follow not supported")
 
         env = {"REMOTE_USER": sysadmin["name"].encode("ascii")}
-        response = app.get(
-            url=url_for("showcase_dataset_showcase_list", id=dataset["id"]),
+
+        response = app.post(
+            url=url_for("showcase_blueprint.dataset_showcase_list", id=dataset["id"]),
+            data={"remove_showcase_id": showcase_one["id"]},
             extra_environ=env,
         )
-        # Submit the remove form.
-        form = response.forms[1]
-        assert form["remove_showcase_id"].value == showcase_one["id"]
-        showcase_remove_response = helpers.submit_and_follow(app, form, env)
 
-        # returns to the correct page
-        assert (
-            showcase_remove_response.request.path
-            == "/dataset/showcases/my-dataset"
-        )
+        # Flash message containing confirmation
+        assert "The dataset has been removed from the showcase." in response.body
+
         # the association is deleted
         assert model.Session.query(ShowcasePackageAssociation).count() == 0
 
 
-@pytest.mark.usefixtures("clean_db")
+@pytest.mark.usefixtures("with_plugins", "clean_db")
 class TestShowcaseAdminManageView(object):
 
     """Plugin adds a showcase admin management page to ckan-admin section."""
@@ -376,16 +339,11 @@ class TestShowcaseAdminManageView(object):
         """
         ckan-admin index page has a showcase config tab.
         """
-        if not tk.check_ckan_version(min_version="2.4"):
-            pytest.skip(
-                "Showcase config tab only available for CKAN 2.4+"
-            )
-
         sysadmin = factories.Sysadmin()
 
         env = {"REMOTE_USER": sysadmin["name"].encode("ascii")}
         response = app.get(
-            url=url_for(controller="admin", action="index"), extra_environ=env
+            url=url_for("admin.index"), extra_environ=env
         )
         # response contains link to dataset's showcase list
         assert "/ckan-admin/showcase_admins" in response
@@ -398,7 +356,7 @@ class TestShowcaseAdminManageView(object):
         sysadmin = factories.Sysadmin()
 
         env = {"REMOTE_USER": sysadmin["name"].encode("ascii")}
-        app.get(url=url_for("showcase_admins"), status=200, extra_environ=env)
+        app.get(url=url_for("showcase_blueprint.admins"), status=200, extra_environ=env)
 
     def test_showcase_admin_manage_page_lists_showcase_admins(self, app):
         """
@@ -420,7 +378,7 @@ class TestShowcaseAdminManageView(object):
 
         env = {"REMOTE_USER": sysadmin["name"].encode("ascii")}
         response = app.get(
-            url=url_for("showcase_admins"), status=200, extra_environ=env
+            url=url_for("showcase_blueprint.admins"), status=200, extra_environ=env
         )
 
         assert "/user/{0}".format(user_one["name"]) in response
@@ -436,13 +394,13 @@ class TestShowcaseAdminManageView(object):
 
         env = {"REMOTE_USER": sysadmin["name"].encode("ascii")}
         response = app.get(
-            url=url_for("showcase_admins"), status=200, extra_environ=env
+            url=url_for("showcase_blueprint.admins"), status=200, extra_environ=env
         )
 
         assert "There are currently no Showcase Admins" in response
 
 
-@pytest.mark.usefixtures("clean_db", "clean_index")
+@pytest.mark.usefixtures("with_plugins", "clean_db", "clean_index")
 class TestSearch(object):
     def test_search_with_nonascii_filter_query(self, app):
         """
@@ -457,7 +415,7 @@ class TestSearch(object):
         assert result["count"] == 1
 
 
-@pytest.mark.usefixtures('clean_db')
+@pytest.mark.usefixtures("with_plugins", "clean_db")
 class TestCKEditor(object):
     @pytest.mark.ckan_config("ckanext.showcase.editor", "ckeditor")
     def test_rich_text_editor_is_shown_when_configured(self, app):
@@ -478,7 +436,7 @@ class TestCKEditor(object):
 
         env = {"REMOTE_USER": sysadmin["name"].encode("ascii")}
         response = app.get(
-            url=url_for("showcase_edit", id="my-showcase",), extra_environ=env,
+            url=url_for("showcase_blueprint.edit", id="my-showcase",), extra_environ=env,
         )
         assert '<textarea id="editor"' not in response.body
 
@@ -489,6 +447,6 @@ class TestCKEditor(object):
 
         env = {'REMOTE_USER': sysadmin['name'].encode('ascii')}
         response = app.get(
-            url=url_for("showcase_read", id="my-showcase",), extra_environ=env,
+            url=url_for("showcase_blueprint.read", id="my-showcase",), extra_environ=env,
         )
         assert '<div class="ck-content">' in response.body
