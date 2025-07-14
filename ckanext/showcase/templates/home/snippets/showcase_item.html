@@ -24,9 +24,9 @@ show_remove    - If True, show the remove button to remove showcase/dataset asso
     {% block image %}
       {% set image_url = h.get_value_from_showcase_extras(showcase.extras, 'image_url') %}
       {% if image_url and not image_url.startswith('http') %}
-        <img data-lazy="/uploads/showcase/{{ image_url }}" alt="{{ showcase.title }}" class="media-image img-responsive">
+        <img data-lazy="/uploads/showcase/{{ image_url }}" alt="{{ showcase.title }}" class="media-image img-responsive" src="/img/1x1.png">
       {% else %}
-        <img data-lazy="{{ image_url or h.url_for_static('/base/images/placeholder-group.png') }}" alt="{{ showcase.title }}" class="media-image img-responsive">
+        <img data-lazy="{{ image_url or h.url_for_static('/base/images/placeholder-group.png') }}" alt="{{ showcase.title }}" class="media-image img-responsive" src="/img/1x1.png">
       {% endif %}
     {% endblock %}
     {% block title %}
